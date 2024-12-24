@@ -207,7 +207,7 @@ $step_titles = [
                         include 'steps/confirmation.php';
                         break;
                     case 3:
-                        include 'steps/status.php';
+                        include '../steps/status.php';
                         break;
                 }
                 ?>

@@ -83,7 +83,9 @@ try {
 
     $pdf->SetFont('helvetica', '', 10);
     $pdf->Cell(160, 5, 'Reference Number:', 0, 0, 'R');
-    $pdf->Cell(30, 5, $student['student_id'], 0, 1, 'L');
+    // Format the student ID with leading zeros and year
+    $formatted_student_id = sprintf("%05d-%s", $student['student_id'], substr(date('Y'), -2));
+    $pdf->Cell(30, 5, $formatted_student_id, 0, 1, 'L');
 
     $pdf->SetFillColor(0, 100, 0);
     $pdf->SetTextColor(255, 255, 255);
@@ -102,13 +104,13 @@ try {
     $pdf->Cell(0, 6, $student['school_address'], 0, 1);
 
     $pdf->Cell(40, 6, 'Student ID:', 0, 0);
-    $pdf->Cell(60, 6, $student['student_id'], 0, 0);
-    $pdf->Cell(40, 6, 'School Type:', 0, 0);
-    $pdf->Cell(0, 6, $student['school_type'], 0, 1);
+    $pdf->Cell(30, 6, $formatted_student_id, 0, 0);
+    $pdf->Cell(70, 6, 'School Type:', 0, 0);
+    $pdf->Cell(6, 6, $student['school_type'], 0, 1);
 
     $pdf->Cell(40, 6, 'Semester:', 0, 0);
-    $pdf->Cell(60, 6, $student['semester'], 0, 0);
-    $pdf->Cell(40, 6, 'Course:', 0, 0);
+    $pdf->Cell(14, 6, $student['semester'], 0, 0);
+    $pdf->Cell(20,6, 'Course:', 0, 0);
     $pdf->Cell(0, 6, $student['course'], 0, 1);
 
     $pdf->Cell(40, 6, 'Block:', 0, 0);
@@ -123,45 +125,68 @@ try {
     $pdf->SetTextColor(0, 0, 0);
     $pdf->SetFont('helvetica', '', 10);
 
-    // Student's full name in larger font
-    $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 10, $student['last_name'] . ', ' . $student['first_name'] . ' ' . $student['middle_name'], 0, 1, 'L');
+    // Student's Information section
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell(0, 8, $student['last_name'] . ', ' . $student['first_name'] . ' ' . $student['middle_name'], 0, 1, 'L');
     $pdf->SetFont('helvetica', '', 10);
 
-    // Personal Info Grid
-    $pdf->Cell(40, 6, 'LRN:', 0, 0);
-    $pdf->Cell(60, 6, $student['lrn_no'], 0, 0);
-    $pdf->Cell(40, 6, 'Date of Birth:', 0, 0);
-    $pdf->Cell(0, 6, $student['date_of_birth'], 0, 1);
+    // Left column F: 25 for label, 60 for value
+    // Right column starts at 120, 25 for label, rest for value
+    $col1_label = 25;
+    $col1_value = 27;
+    $col2_start = 120;
+    $col2_label = 25;
+    $line_height = 5;  // Reduced line height for more compact layout
 
-    $pdf->Cell(40, 6, 'Age:', 0, 0);
-    $pdf->Cell(60, 6, $student['age'], 0, 0);
-    $pdf->Cell(40, 6, 'Sex:', 0, 0);
-    $pdf->Cell(0, 6, $student['sex'], 0, 1);
+    // Personal Information with fixed layout
+    $pdf->Cell($col1_label, $line_height, 'LRN:', 0, 0);
+    $pdf->Cell($col1_value, $line_height, $student['lrn_no'], 0, 0);
+    $pdf->SetX($col2_start);
+    $pdf->Cell($col2_label, $line_height, 'Date of Birth:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['date_of_birth'], 0, 1);
 
-    $pdf->Cell(40, 6, 'Religion:', 0, 0);
-    $pdf->Cell(60, 6, $student['religion'], 0, 0);
-    $pdf->Cell(40, 6, 'Phone Number:', 0, 0);
-    $pdf->Cell(0, 6, $student['phone_number'], 0, 1);
+    $pdf->Cell($col1_label, $line_height, 'Age:', 0, 0);
+    $pdf->Cell($col1_value, $line_height, $student['age'], 0, 0);
+    $pdf->SetX($col2_start);
+    $pdf->Cell($col2_label, $line_height, 'Sex:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['sex'], 0, 1);
 
-    $pdf->Cell(40, 6, 'Email Address:', 0, 0);
-    $pdf->Cell(60, 6, $student['email_address'], 0, 0);
-    $pdf->Cell(40, 6, "Father's Name:", 0, 0);
-    $pdf->Cell(0, 6, $student['fathers_name'], 0, 1);
+    $pdf->Cell($col1_label, $line_height, 'Religion:', 0, 0);
+    $pdf->Cell($col1_value, $line_height, $student['religion'], 0, 0);
+    $pdf->SetX($col2_start);
+    $pdf->Cell($col2_label, $line_height, 'Phone Number:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['phone_number'], 0, 1);
 
-    // Address Information
-    $pdf->Cell(40, 6, 'PERMANENT ADDRESS', 0, 1, 'L');
-    $pdf->Cell(40, 6, 'House number and street:', 0, 0);
-    $pdf->Cell(0, 6, $student['house_number_street'], 0, 1);
-    $pdf->Cell(40, 6, 'City/Municipality:', 0, 0);
-    $pdf->Cell(60, 6, $student['city_municipality'], 0, 0);
-    $pdf->Cell(40, 6, 'Barangay:', 0, 0);
-    $pdf->Cell(0, 6, $student['barangay'], 0, 1);
-    $pdf->Cell(40, 6, 'Province:', 0, 0);
-    $pdf->Cell(60, 6, $student['province'], 0, 0);
-    $pdf->Cell(40, 6, 'Region:', 0, 0);
-    $pdf->Cell(0, 6, $student['region'], 0, 1);
-    $pdf->Ln(5);
+    $pdf->Cell($col1_label, $line_height, 'Email:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['email_address'], 0, 1);
+
+    // Parents information with fixed layout
+    $pdf->Cell(40, $line_height, "Father's Name:", 0, 0);
+    $pdf->Cell(0, $line_height, $student['fathers_name'], 0, 1);
+
+    $pdf->Cell(40, $line_height, "Mother's Name:", 0, 0);
+    $pdf->Cell(0, $line_height, $student['mothers_maiden_name'], 0, 1);
+
+    // Permanent Address
+    $pdf->Ln(2);
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(0, $line_height, 'PERMANENT ADDRESS', 0, 1, 'L');
+    $pdf->SetFont('helvetica', '', 10);
+
+    $pdf->Cell(45, $line_height, 'House number and street:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['house_number_street'], 0, 1);
+
+    $pdf->Cell(45, $line_height, 'City/Municipality:', 0, 0);
+    $pdf->Cell(60, $line_height, $student['city_municipality'], 0, 0);
+    $pdf->SetX($col2_start);
+    $pdf->Cell(35, $line_height, 'Barangay:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['barangay'], 0, 1);
+
+    $pdf->Cell(45, $line_height, 'Province:', 0, 0);
+    $pdf->Cell(60, $line_height, $student['province'], 0, 0);
+    $pdf->SetX($col2_start);
+    $pdf->Cell(35, $line_height, 'Region:', 0, 0);
+    $pdf->Cell(0, $line_height, $student['region'], 0, 1);
 
     // SUBJECT LOADS
     $pdf->SetFillColor(0, 100, 0);
@@ -193,8 +218,8 @@ try {
     $pdf->Cell(100, 7, 'Total Units', 1, 0, 'R');
     $pdf->Cell(85, 7, array_sum(array_column($subjects, 'units')), 1, 1, 'C');
 
-    // CHARGES section
-    $pdf->Ln(5);
+    // Charges Section
+    $pdf->Ln(2);
     $pdf->SetFillColor(0, 100, 0);
     $pdf->SetTextColor(255, 255, 255);
     $pdf->SetFont('helvetica', 'B', 11);
@@ -202,20 +227,58 @@ try {
     $pdf->SetTextColor(0, 0, 0);
     $pdf->SetFont('helvetica', '', 10);
 
-    // Add charges if you have them in your database
-    $charges = [
-        'ENTRANCE FEE' => '0.00',
-        'MISC. FEES' => '0.00',
-        'LABORATORY FEE' => '0.00',
-        'TUITION FEE' => '0.00',
-        'OTHERS' => '0.00',
-        'TOTAL' => '0.00',
-        'DEPOSIT' => '0.00'
-    ];
+    // Function to draw charge line with value inside underline
+    function drawChargeLine($pdf, $label, $amount, $line_height = 6) {
+        $amount_formatted = number_format($amount, 2);
+        $pdf->Cell(40, $line_height, $label, 0, 0);
+        
+        // Create underlined cell with value inside
+        $pdf->Cell(100, $line_height, $amount_formatted, 'B', 0, 'R');
+        
+        // Add some spacing
+        $pdf->Cell(0, $line_height, '', 0, 1);
+    }
 
-    foreach($charges as $label => $amount) {
-        $pdf->Cell(100, 6, $label, 0, 0);
-        $pdf->Cell(0, 6, number_format((float)$amount, 2), 0, 1, 'R');
+    try {
+        // Calculate charges
+        $total_units = array_sum(array_column($subjects, 'units'));
+        $tuition_fee = $total_units * $student['per_unit_fee'];
+
+        // Calculate laboratory fees - fixed the undefined variable
+        $lab_subjects = array_filter($subjects, function($subject) {
+            return strpos(strtolower($subject['description']), 'laboratory') !== false;
+        });
+        $laboratory_fee = count($lab_subjects) * $student['laboratory_fee'];
+
+        $total = $student['entrance_fee'] + 
+                 $student['misc_fee'] + 
+                 $laboratory_fee + 
+                 $tuition_fee + 
+                 $student['other_fees'];
+
+        // Draw charges
+        drawChargeLine($pdf, 'ENTRANCE FEE', $student['entrance_fee']);
+        drawChargeLine($pdf, 'MISC. FEES', $student['misc_fee']);
+        drawChargeLine($pdf, 'LABORATORY FEE', $laboratory_fee);
+        drawChargeLine($pdf, 'TUITION FEE', $tuition_fee);
+        drawChargeLine($pdf, 'OTHERS', $student['other_fees']);
+        
+        // Total with double underline
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(40, 6, 'TOTAL', 0, 0);
+        $pdf->Cell(100, 6, number_format($total, 2), 'B', 0, 'R');
+        $pdf->Cell(0, 6, '', 0, 1);
+        $pdf->Cell(40, 1, '', 0, 0);
+        $pdf->Cell(100, 1, '', 'B', 0); // Second underline
+        $pdf->Cell(0, 1, '', 0, 1);
+        
+        // Deposit line
+        $pdf->SetFont('helvetica', '', 10);
+        drawChargeLine($pdf, 'DEPOSIT', $student['deposit']);
+
+    } catch (Exception $e) {
+        error_log("Error in PDF generation: " . $e->getMessage());
+        die("Error generating PDF: " . $e->getMessage());
     }
 
     // Student's Oath

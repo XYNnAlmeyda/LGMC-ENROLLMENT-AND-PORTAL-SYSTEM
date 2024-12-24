@@ -198,7 +198,7 @@ try {
     $_SESSION['student_id'] = $student_id;
     
     // Redirect to enrollment.php with step=2
-    header("Location: ../steps/confirmation.php");
+    header("Location: confirmation.php");
     exit();
 
 } catch (PDOException $e) {
@@ -207,7 +207,7 @@ try {
     error_log("Database Error: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     $_SESSION['error_message'] = "Registration failed: " . $e->getMessage();
-    header("Location: steps/registration_form.php");
+    header("Location: ../steps/registration_form.php");
     exit();
 }
 ?>

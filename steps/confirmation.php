@@ -1,14 +1,22 @@
 <?php
-session_start();
+// Only start session if one hasn't been started already
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Check if success message exists
-if (!isset($_SESSION['success_message'])) {
-    header("Location: registration_form.php");
+// Store the check result in a variable instead of redirecting immediately
+$should_redirect = !isset($_SESSION['success_message']);
+
+// Get session variables
+$success_message = $_SESSION['success_message'] ?? '';
+$student_email = $_SESSION['student_email'] ?? '';
+
+// If we need to redirect, do it using JavaScript instead
+if ($should_redirect) {
+    echo "<script>window.location.href = 'registration_form.php';</script>";
     exit();
 }
 
-$success_message = $_SESSION['success_message'];
-$student_email = $_SESSION['student_email'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -84,13 +92,6 @@ $student_email = $_SESSION['student_email'] ?? '';
     <div class="confirmation-container text-center">
         <i class="fas fa-check-circle success-icon"></i>
         <h2 class="mb-4">Registration Successful!</h2>
-        
-        <div class="email-confirmation">
-            <h5 class="mb-3">Confirmation Email</h5>
-            <p class="mb-2">A confirmation email will be sent to:</p>
-            <p class="fw-bold mb-2"><?php echo htmlspecialchars($student_email); ?></p>
-            <p class="text-muted mb-0"><small>Please check your email for further instructions</small></p>
-        </div>
 
         <div class="alert alert-info" role="alert">
             <h5 class="mb-3">Next Steps:</h5>

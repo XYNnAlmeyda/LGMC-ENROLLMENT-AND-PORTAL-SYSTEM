@@ -1,3 +1,7 @@
+<?php
+    // Add this at the very top of your file
+    require_once('../config/database.php');  // Adjust the path based on your file structure
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,7 +175,27 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label for="student_id" class="form-label">Student ID</label>
-                                    <input type="text" class="form-control" id="student_id" name="student_id">
+                                    <?php
+                                        try {
+                                            // Using existing $conn from config/database.php
+                                            $query = "SELECT MAX(CAST(student_id AS UNSIGNED)) as last_id FROM academic_info";
+                                            $stmt = $conn->prepare($query);
+                                            $stmt->execute();
+                                            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                            
+                                            // Generate next ID (increment by 1)
+                                            $next_id = ($result['last_id'] ?? 0) + 1;
+                                            
+                                            // Format: ID-YY (e.g., 00093-25)
+                                            $formatted_id = sprintf("%05d-%s", $next_id, substr(date('Y'), -2));
+                                            
+                                        } catch (PDOException $e) {
+                                            $formatted_id = "ERROR: " . $e->getMessage();
+                                        }
+                                    ?>
+                                    <input type="text" class="form-control" id="student_id" name="student_id" 
+                                        value="<?php echo $formatted_id; ?>" 
+                                        readonly disabled>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="semester" class="form-label">Semester</label>
